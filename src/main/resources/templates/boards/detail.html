@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${board.title}">게시글 상세</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+        .back { display: inline-block; margin-bottom: 24px; color: #666; text-decoration: none; font-size: 14px; }
+        .back:hover { text-decoration: underline; }
+        h1 { font-size: 26px; margin: 0 0 12px; line-height: 1.4; }
+        .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: #888;
+            padding-bottom: 16px; border-bottom: 2px solid #1a1a1a; }
+        .content { padding: 32px 4px; line-height: 1.8; white-space: pre-wrap;
+            border-bottom: 1px solid #e5e5e5; min-height: 200px; }
+        .footer { padding-top: 16px; font-size: 13px; color: #aaa; }
+
+        .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+        .btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit; }
+        .btn-edit { background: #1a1a1a; color: #fff; }
+        .btn-edit:hover { background: #333; }
+        .btn-delete { background: #fff; color: #c92a2a; border: 1px solid #ffc9c9; }
+        .btn-delete:hover { background: #fff5f5; }
+    </style>
+</head>
+<body>
+
+<a class="back" th:href="@{/boards}">← 목록으로</a>
+
+<h1 th:text="${board.title}">게시글 제목</h1>
+
+<div class="meta">
+    <span th:text="${board.writer}">작성자</span>
+    <span th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
+    <span th:text="'조회 ' + ${board.viewCount}">조회 0</span>
+</div>
+
+<div class="content" th:text="${board.content}">
+    본문 내용이 여기에 들어갑니다.
+</div>
+
+<div class="footer" th:if="${board.modifiedAt != null}">
+    최종 수정: <span th:text="${#temporals.format(board.modifiedAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
+</div>
+
+<div class="actions">
+    <a class="btn btn-edit" th:href="@{/boards/{id}/edit(id=${board.boardId})}">수정</a>
+
+    <form th:action="@{/boards/{id}/delete(id=${board.boardId})}" method="post"
+          onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <button type="submit" class="btn btn-delete">삭제</button>
+    </form>
+</div>
+
+</body>
+</html>

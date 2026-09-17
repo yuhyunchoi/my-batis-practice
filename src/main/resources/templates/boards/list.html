@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 목록</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    h1 { font-size: 24px; margin: 0; }
+    .btn { display: inline-block; padding: 9px 18px; background: #1a1a1a; color: #fff;
+      text-decoration: none; border-radius: 6px; font-size: 14px; }
+    .btn:hover { background: #333; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 8px; border-bottom: 1px solid #e5e5e5; text-align: left; }
+    th { background: #fafafa; font-weight: 600; font-size: 14px; color: #666; }
+    td a { color: #1a1a1a; text-decoration: none; }
+    td a:hover { text-decoration: underline; }
+    .num { width: 60px; color: #999; }
+    .empty { text-align: center; color: #999; padding: 40px 0; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>게시글 목록</h1>
+  <a class="btn" th:href="@{/boards/new}">글쓰기</a>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th class="num">번호</th>
+    <th>제목</th>
+    <th>작성자</th>
+    <th>작성일</th>
+    <th>조회수</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="board : ${boards}">
+    <td class="num" th:text="${board.boardId}">1</td>
+    <td>
+      <a th:href="@{/boards/{id}(id=${board.boardId})}"
+         th:text="${board.title}">제목이 들어갑니다</a>
+    </td>
+    <td th:text="${board.writer}">작성자</td>
+    <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd')}">2026-01-01</td>
+    <td th:text="${board.viewCount}">0</td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(boards)}">
+    <td colspan="5" class="empty">등록된 글이 없습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
