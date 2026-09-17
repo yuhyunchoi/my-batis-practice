@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${board != null} ? '글 수정' : '글쓰기'">글쓰기</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+        .back { display: inline-block; margin-bottom: 24px; color: #666; text-decoration: none; font-size: 14px; }
+        .back:hover { text-decoration: underline; }
+        h1 { font-size: 24px; margin: 0 0 24px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; font-weight: 600; color: #444; margin-bottom: 6px; }
+        input[type=text], textarea {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
+            font-family: inherit; font-size: 15px; box-sizing: border-box;
+        }
+        input[type=text]:focus, textarea:focus { outline: none; border-color: #1a1a1a; }
+        input[readonly] { background: #f5f5f5; color: #888; }
+        textarea { min-height: 300px; resize: vertical; line-height: 1.7; }
+        .actions { display: flex; gap: 8px; margin-top: 28px; }
+        .btn { padding: 10px 20px; border-radius: 6px; font-size: 14px; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit; }
+        .btn-primary { background: #1a1a1a; color: #fff; }
+        .btn-primary:hover { background: #333; }
+        .btn-cancel { background: #f0f0f0; color: #444; }
+        .btn-cancel:hover { background: #e5e5e5; }
+    </style>
+</head>
+<body>
+
+<a class="back" th:href="@{/boards}">← 목록으로</a>
+
+<h1 th:text="${board != null} ? '글 수정' : '글쓰기'">글쓰기</h1>
+
+<form method="post"
+      th:action="${board != null} ? @{/boards/{id}/edit(id=${board.boardId})} : @{/boards}">
+
+    <div class="field">
+        <label for="title">제목</label>
+        <input type="text" id="title" name="title" maxlength="200" required
+               th:value="${board != null} ? ${board.title} : ''">
+    </div>
+
+    <div class="field">
+        <label for="writer">작성자</label>
+        <input type="text" id="writer" name="writer" maxlength="10" required
+               th:value="${board != null} ? ${board.writer} : ''"
+               th:readonly="${board != null}">
+    </div>
+
+    <div class="field">
+        <label for="content">내용</label>
+        <textarea id="content" name="content" required
+                  th:text="${board != null} ? ${board.content} : ''"></textarea>
+    </div>
+
+    <div class="actions">
+        <button type="submit" class="btn btn-primary"
+                th:text="${board != null} ? '수정' : '등록'">등록</button>
+        <a class="btn btn-cancel"
+           th:href="${board != null} ? @{/boards/{id}(id=${board.boardId})} : @{/boards}">취소</a>
+    </div>
+
+</form>
+
+</body>
+</html>
