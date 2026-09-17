@@ -3,12 +3,16 @@ package com.yuhyun.mybatispractice.board.service.impl;
 import com.yuhyun.mybatispractice.board.domain.Board;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
+import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,14 +70,27 @@ public class BoardServiceImpl implements BoardService {
         return BoardResponse.from(saved);
     }
 
-
     @Override
-    public int updateBoard(Board board) {
-        return 0;
+    @Transactional
+    public BoardResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest) {
+        Board origin = boardMapper.findById(boardId);
+
+        origin.setTitle(boardRequest.title());
+        origin.setContent(boardRequest.content());
+
+        boardMapper.update(origin);
+
+        Board updated = boardMapper.findById(boardId);
+
+        return BoardResponse.from(updated);
     }
 
+
     @Override
-    public int deleteById(Long boardId) {
-        return 0;
+    public void deleteById(Long boardId) {
+        int affected = boardMapper.deleteById(boardId);
+        if (affected == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, boardId + "번 글을 찾을 수 없습니다.");
+        }
     }
 }
