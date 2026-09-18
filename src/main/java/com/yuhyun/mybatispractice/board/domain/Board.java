@@ -14,14 +14,23 @@ public class Board {
     private Long boardId;
     private String title;
     private String content;
+    private String password;
     private String writer;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private int viewCount;
 
 
-    public static Board of(BoardRequest request) {
-        return new Board(null, request.title(), request.content(), request.writer(), null, null, 0);
+    public static Board of(String title, String content, String password, String writer) {
+        return new Board(null,
+                title,
+                content,
+                password,
+                writer,
+                null,
+                null,
+                0);
     }
 
 }
+

@@ -1,9 +1,11 @@
 package com.yuhyun.mybatispractice.board.controller;
 
+import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
 import com.yuhyun.mybatispractice.board.service.BoardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,11 +44,10 @@ public class BoardViewController {
     }
 
     @PostMapping
-    public String registerBoard(@ModelAttribute BoardRequest boardRequest) {
+    public String registerBoard(@Valid @ModelAttribute BoardRequest boardRequest) {
         boardService.createBoard(boardRequest);
         return "redirect:/boards";
     }
-
 
     @GetMapping("/{board-id}/edit")
     public String editFormView(@PathVariable(name = "board-id") Long boardId,
@@ -59,15 +60,15 @@ public class BoardViewController {
 
     @PostMapping("/{board-id}/edit")
     public String updateBoard(@PathVariable(name = "board-id") Long boardId,
-                              @ModelAttribute BoardUpdateRequest boardUpdateRequest) {
+                              @Valid @ModelAttribute BoardUpdateRequest boardUpdateRequest) {
         boardService.updateBoard(boardId, boardUpdateRequest);
 
         return "redirect:/boards/" + boardId;
     }
 
     @PostMapping("/{board-id}/delete")
-    public String deleteBoard(@PathVariable(name = "board-id") Long boarId) {
-        boardService.deleteById(boarId);
+    public String deleteBoard(@PathVariable(name = "board-id") Long boarId, @Valid @ModelAttribute BoardDeleteRequest boardDeleteRequest) {
+        boardService.deleteById(boarId, boardDeleteRequest);
         return "redirect:/boards";
     }
 }

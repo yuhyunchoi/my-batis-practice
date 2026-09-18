@@ -24,6 +24,7 @@
         .btn-primary:hover { background: #333; }
         .btn-cancel { background: #f0f0f0; color: #444; }
         .btn-cancel:hover { background: #e5e5e5; }
+        .hint { font-size: 13px; color: #999; margin: 6px 0 0; }
     </style>
 </head>
 <body>
@@ -47,7 +48,14 @@
                th:value="${board != null} ? ${board.writer} : ''"
                th:readonly="${board != null}">
     </div>
-
+    <div class="field">
+        <label for="password" th:text="${board != null} ? '비밀번호 확인' : '비밀번호'">비밀번호</label>
+        <input type="password" id="password" name="password"
+               minlength="4" maxlength="20" required>
+        <p class="hint" th:text="${board != null}
+               ? '글 작성 시 입력한 비밀번호를 입력해주세요'
+               : '수정·삭제할 시 필요합니다. 4~20자'">수정·삭제할 때 필요합니다</p>
+    </div>
     <div class="field">
         <label for="content">내용</label>
         <textarea id="content" name="content" required
