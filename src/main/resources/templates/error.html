@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오류</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto;
+            padding: 0 16px; text-align: center; }
+        .code { font-size: 64px; font-weight: 700; color: #ddd; margin: 60px 0 0; }
+        h1 { font-size: 22px; margin: 12px 0 8px; }
+        p { color: #888; font-size: 15px; margin-bottom: 32px; }
+        .btn { display: inline-block; padding: 10px 22px; background: #1a1a1a; color: #fff;
+            text-decoration: none; border-radius: 6px; font-size: 14px; }
+        .btn:hover { background: #333; }
+    </style>
+</head>
+<body>
+
+<p class="code" th:text="${status} ?: 500">500</p>
+
+<h1 th:text="${status} == 404 ? '찾을 수 없습니다' : '문제가 발생했습니다'">문제가 발생했습니다</h1>
+
+<p th:if="${message}" th:text="${message}">9999번 글을 찾을 수 없습니다.</p>
+<p th:unless="${message}">요청을 처리하는 중 오류가 생겼습니다.<br>잠시 후 다시 시도해주세요.</p>
+
+<a class="btn" th:href="@{/boards}">목록으로 돌아가기</a>
+
+</body>
+</html>

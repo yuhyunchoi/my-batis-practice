@@ -22,8 +22,8 @@
 
     <!-- insert-->
     <insert id="insert" useGeneratedKeys="true" keyProperty="boardId">
-        insert into BOARD(TITLE, CONTENT, WRITER)
-        values (#{title}, #{content}, #{writer})
+        insert into BOARD(TITLE, CONTENT, WRITER, PASSWORD)
+        values (#{title}, #{content}, #{writer}, #{password})
     </insert>
 
     <!--    update-->

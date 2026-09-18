@@ -1,13 +1,18 @@
 package com.yuhyun.mybatispractice.board.service.impl;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
+import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
 import com.yuhyun.mybatispractice.board.service.BoardService;
+import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
+import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,12 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
     private final BoardMapper boardMapper;
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<BoardResponse> getAllBoard() {
@@ -51,19 +57,23 @@ public class BoardServiceImpl implements BoardService {
         boardMapper.increaseViewCount(boardId);
         Board target = boardMapper.findById(boardId);
 
-        return new BoardResponse(target.getBoardId(),
-                target.getTitle(),
-                target.getContent(),
-                target.getWriter(),
-                target.getCreatedAt(),
-                target.getModifiedAt(),
-                target.getViewCount());
+        if (target == null) {
+            throw new BoardNotFoundException(boardId);
+        }
+
+        return BoardResponse.from(target);
     }
 
     @Override
     @Transactional
     public BoardResponse createBoard(BoardRequest boardRequest) {
-        Board createdBoard = Board.of(boardRequest);
+        String encodedPassword = passwordEncoder.encode(boardRequest.password());
+
+        Board createdBoard = Board.of(boardRequest.title(),
+                boardRequest.content(),
+                encodedPassword,
+                boardRequest.writer());
+
         boardMapper.insert(createdBoard);
 
         Board saved = boardMapper.findById(createdBoard.getBoardId());
@@ -74,6 +84,10 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public BoardResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest) {
         Board origin = boardMapper.findById(boardId);
+
+        if (!passwordEncoder.matches(boardRequest.password(), origin.getPassword())) {
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
 
         origin.setTitle(boardRequest.title());
         origin.setContent(boardRequest.content());
@@ -87,8 +101,14 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
-    public void deleteById(Long boardId) {
+    public void deleteById(Long boardId, BoardDeleteRequest boardDeleteRequest) {
+
+        if (!passwordEncoder.matches(boardDeleteRequest.password(), boardMapper.findById(boardId).getPassword())) {
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
+
         int affected = boardMapper.deleteById(boardId);
+
         if (affected == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, boardId + "번 글을 찾을 수 없습니다.");
         }
