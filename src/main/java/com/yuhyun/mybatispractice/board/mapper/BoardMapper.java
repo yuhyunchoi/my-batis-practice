@@ -1,7 +1,6 @@
 package com.yuhyun.mybatispractice.board.mapper;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

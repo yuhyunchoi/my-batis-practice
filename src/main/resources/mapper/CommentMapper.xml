@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yuhyun.mybatispractice.comment.mapper.CommentMapper">
+
+    <select id="findCommentsByBoardId" resultType="com.yuhyun.mybatispractice.comment.domain.Comment">
+        select * from BOARD_COMMENT where BOARD_ID = #{boardId}
+    </select>
+
+    <select id="findById" resultType="com.yuhyun.mybatispractice.comment.domain.Comment">
+        select * from BOARD_COMMENT where COMMENT_ID = #{comment-id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="commentId">
+        insert into BOARD_COMMENT(BOARD_ID, CONTENT, WRITER, PASSWORD)
+        values(#{boardId}, #{content}, #{writer}, #{password})
+    </insert>
+
+    <update id="update">
+        update BOARD_COMMENT set CONTENT = #{content}, PASSWORD = #{password}, MODIFIED_AT = CURRENT_TIMESTAMP
+        where COMMENT_ID = #{commentId}
+    </update>
+
+    <delete id="deleteById">
+        delete from BOARD_COMMENT where COMMENT_ID = #{comment-id}
+    </delete>
+</mapper>

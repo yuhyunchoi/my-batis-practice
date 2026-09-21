@@ -28,7 +28,8 @@
 
     <!--    update-->
     <update id="update">
-        update BOARD set TITLE = #{title}, CONTENT = #{content}, MODIFIED_AT = CURRENT_TIMESTAMP where BOARD_ID = #{boardId}
+        update BOARD set TITLE = #{title}, CONTENT = #{content}, MODIFIED_AT = CURRENT_TIMESTAMP
+        where BOARD_ID = #{boardId}
     </update>
 
     <!--  delete -->

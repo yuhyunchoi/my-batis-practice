@@ -15,7 +15,13 @@ public record BoardResponse(
 ) {
     public static BoardResponse from(Board board) {
         return new BoardResponse(
-                board.getBoardId(), board.getTitle(), board.getContent(), board.getWriter(), board.getCreatedAt(), board.getModifiedAt(), board.getViewCount()
+                board.getBoardId(),
+                board.getTitle(),
+                board.getContent(),
+                board.getWriter(),
+                board.getCreatedAt(),
+                board.getModifiedAt(),
+                board.getViewCount()
         );
     }
 }

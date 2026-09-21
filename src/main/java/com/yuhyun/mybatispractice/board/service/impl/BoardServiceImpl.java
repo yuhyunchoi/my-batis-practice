@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,28 +33,16 @@ public class BoardServiceImpl implements BoardService {
     public List<BoardResponse> getAllBoard() {
         List<Board> boardList = boardMapper.findAll();
 
-        List<BoardResponse> boardResponseList = new ArrayList<>();
-
-        for(Board savedBoard : boardList) {
-            BoardResponse response = new BoardResponse(
-                    savedBoard.getBoardId(),
-                    savedBoard.getTitle(),
-                    savedBoard.getContent(),
-                    savedBoard.getWriter(),
-                    savedBoard.getCreatedAt(),
-                    savedBoard.getModifiedAt(),
-                    savedBoard.getViewCount());
-            boardResponseList.add(response);
-        }
-
-        return boardResponseList;
+        return boardList.stream()
+                .map(BoardResponse::from)
+                .toList();
     }
 
     @Override
     @Transactional
     public BoardResponse findByBoardId(Long boardId) {
-        boardMapper.increaseViewCount(boardId);
-        Board target = boardMapper.findById(boardId);
+        boardMapper.increaseViewCount(boardId);Board target = boardMapper.findById(boardId);
+
 
         if (target == null) {
             throw new BoardNotFoundException(boardId);
@@ -102,7 +89,6 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void deleteById(Long boardId, BoardDeleteRequest boardDeleteRequest) {
-
         if (!passwordEncoder.matches(boardDeleteRequest.password(), boardMapper.findById(boardId).getPassword())) {
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
@@ -110,7 +96,7 @@ public class BoardServiceImpl implements BoardService {
         int affected = boardMapper.deleteById(boardId);
 
         if (affected == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, boardId + "번 글을 찾을 수 없습니다.");
+            throw new BoardNotFoundException(boardId + "번 글을 삭제할 수 없습니다.");
         }
     }
 }
