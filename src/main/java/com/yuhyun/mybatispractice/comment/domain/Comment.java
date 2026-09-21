@@ -1,7 +1,6 @@
 package com.yuhyun.mybatispractice.comment.domain;
 
 
-import com.yuhyun.mybatispractice.comment.domain.dto.CommentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

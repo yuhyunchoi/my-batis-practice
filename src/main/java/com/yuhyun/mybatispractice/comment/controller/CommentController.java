@@ -5,7 +5,6 @@ import com.yuhyun.mybatispractice.comment.domain.dto.CommentRequest;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentResponse;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentUpdateRequest;
 import com.yuhyun.mybatispractice.comment.service.CommentService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,5 @@
 package com.yuhyun.mybatispractice.board.service;
 
-import com.yuhyun.mybatispractice.board.domain.Board;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
