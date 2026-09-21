@@ -9,7 +9,7 @@ public record CommentResponse(
         Long boardId,
         String content,
         String writer,
-        LocalDateTime cratedAt,
+        LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
 

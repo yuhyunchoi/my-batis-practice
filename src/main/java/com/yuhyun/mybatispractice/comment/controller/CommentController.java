@@ -6,6 +6,7 @@ import com.yuhyun.mybatispractice.comment.domain.dto.CommentResponse;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentUpdateRequest;
 import com.yuhyun.mybatispractice.comment.service.CommentService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/v1/api/comments")
 public class CommentController {
 
@@ -24,9 +25,10 @@ public class CommentController {
         return commentService.findCommentsByBoardId(boarId);
     }
 
-    @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest commentRequest) {
-        CommentResponse response = commentService.createComment(commentRequest);
+    @PostMapping("/{board-id}")
+    public ResponseEntity<CommentResponse> createComment(@PathVariable(name = "board-id") Long boardId,
+                                                         @RequestBody CommentRequest commentRequest) {
+        CommentResponse response = commentService.createComment(boardId, commentRequest);
 
         return ResponseEntity.created(URI.create("/v1/api/comment" + response.commentId())).body(response);
     }

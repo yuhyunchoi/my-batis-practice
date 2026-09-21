@@ -35,10 +35,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentResponse createComment(CommentRequest commentRequest) {
+    public CommentResponse createComment(Long boarId, CommentRequest commentRequest) {
         String encodedPassword = passwordEncoder.encode(commentRequest.password());
 
-        Comment comment = Comment.of(commentRequest.boardId(),
+        Comment comment = Comment.of(boarId,
                 commentRequest.content(),
                 commentRequest.writer(),
                 encodedPassword);

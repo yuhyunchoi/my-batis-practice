@@ -21,6 +21,7 @@
         .btn-edit:hover { background: #333; }
         .btn-delete { background: #fff; color: #c92a2a; border: 1px solid #ffc9c9; }
         .btn-delete:hover { background: #fff5f5; }
+
         dialog {
             border: none; border-radius: 12px; padding: 28px 32px; width: 340px;
             box-shadow: 0 12px 40px rgba(0,0,0,.18);
@@ -36,9 +37,45 @@
         .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
         .btn-cancel { background: #f0f0f0; color: #444; }
         .btn-cancel:hover { background: #e5e5e5; }
+
+        .dialog-wide { width: 440px; }
+        .dialog-wide textarea {
+            width: 100%; min-height: 100px; padding: 10px 12px; margin-bottom: 8px;
+            border: 1px solid #ddd; border-radius: 6px; font-family: inherit;
+            font-size: 15px; resize: vertical; box-sizing: border-box; line-height: 1.6;
+        }
+        .dialog-wide textarea:focus { outline: none; border-color: #1a1a1a; }
+
+        .comments { margin-top: 48px; }
+        .comments h2 { font-size: 17px; margin: 0 0 16px; }
+        .comment-list { list-style: none; padding: 0; margin: 0 0 28px; }
+        .comment-list li { padding: 16px 4px; border-bottom: 1px solid #f0f0f0; }
+        .comment-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .comment-writer { font-weight: 600; font-size: 14px; }
+        .comment-date { font-size: 13px; color: #aaa; }
+        .comment-content { margin: 0; font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
+        .comment-empty { color: #aaa; font-size: 14px; text-align: center; padding: 28px 0 !important; }
+
+        .comment-btn { background: none; border: none; cursor: pointer;
+            color: #bbb; font-size: 13px; font-family: inherit; padding: 0; }
+        .comment-edit { margin-left: auto; }
+        .comment-edit:hover { color: #1a1a1a; }
+        .comment-del:hover { color: #c92a2a; }
+
+        .comment-form textarea {
+            width: 100%; min-height: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 6px;
+            font-family: inherit; font-size: 15px; resize: vertical; box-sizing: border-box; line-height: 1.6;
+        }
+        .comment-form textarea:focus { outline: none; border-color: #1a1a1a; }
+        .comment-form-bottom { display: flex; gap: 8px; margin-top: 8px; }
+        .comment-form-bottom input {
+            padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; font-family: inherit; width: 140px;
+        }
+        .comment-form-bottom input:focus { outline: none; border-color: #1a1a1a; }
+        .comment-form-bottom button { margin-left: auto; }
     </style>
 </head>
-<body>
 
 <a class="back" th:href="@{/boards}">← 목록으로</a>
 
@@ -76,7 +113,86 @@
             <button type="submit" class="btn btn-delete">삭제</button>
         </div>
     </form>
+</dialog><section class="comments">
+    <h2 th:text="'댓글 ' + ${#lists.size(comments)}">댓글 0</h2>
+
+    <ul class="comment-list">
+        <li th:each="comment : ${comments}" class="comment-item">
+            <div class="comment-head">
+                <span class="comment-writer" th:text="${comment.writer}">작성자</span>
+                <span class="comment-date"
+                      th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+
+                <button type="button" class="comment-btn comment-edit"
+                        th:data-url="@{/boards/{bid}/comments/{cid}/edit(bid=${board.boardId}, cid=${comment.commentId})}"
+                        th:data-content="${comment.content}"
+                        onclick="openCommentEdit(this)">수정</button>
+
+                <button type="button" class="comment-btn comment-del"
+                        th:data-url="@{/boards/{bid}/comments/{cid}/delete(bid=${board.boardId}, cid=${comment.commentId})}"
+                        onclick="openCommentDelete(this)">삭제</button>
+            </div>
+            <p class="comment-content" th:text="${comment.content}">내용</p>
+        </li>
+
+        <li th:if="${#lists.isEmpty(comments)}" class="comment-empty">
+            첫 번째 댓글을 남겨보세요.
+        </li>
+    </ul>
+
+    <form class="comment-form" method="post"
+          th:action="@{/boards/{id}/comments(id=${board.boardId})}">
+        <textarea name="content" maxlength="500"
+                  placeholder="댓글을 입력하세요" required></textarea>
+        <div class="comment-form-bottom">
+            <input type="text" name="writer" placeholder="작성자"
+                   maxlength="20" required>
+            <input type="password" name="password" placeholder="비밀번호"
+                   minlength="4" maxlength="20" required>
+            <button type="submit" class="btn btn-edit">등록</button>
+        </div>
+    </form>
+</section>
+
+
+
+<dialog id="commentEditDialog" class="dialog-wide">
+    <form id="commentEditForm" method="post">
+        <h2>댓글 수정</h2>
+        <textarea id="commentEditContent" name="content" maxlength="500" required></textarea>
+        <input type="password" name="password" placeholder="비밀번호"
+               minlength="4" maxlength="20" required>
+        <div class="dialog-actions">
+            <button type="button" class="btn btn-cancel" onclick="commentEditDialog.close()">취소</button>
+            <button type="submit" class="btn btn-edit">수정</button>
+        </div>
+    </form>
 </dialog>
+<dialog id="commentDeleteDialog">
+    <form id="commentDeleteForm" method="post">
+        <h2>댓글 삭제</h2>
+        <p>삭제하려면 비밀번호를 입력해주세요.</p>
+        <input type="password" name="password" placeholder="비밀번호"
+               minlength="4" maxlength="20" required>
+        <div class="dialog-actions">
+            <button type="button" class="btn btn-cancel" onclick="commentDeleteDialog.close()">취소</button>
+            <button type="submit" class="btn btn-delete">삭제</button>
+        </div>
+    </form>
+</dialog>
+
+
+<script>
+    function openCommentDelete(button) {
+        commentDeleteForm.action = button.dataset.url;
+        commentDeleteDialog.showModal();
+    }
+    function openCommentEdit(button) {
+        commentEditForm.action = button.dataset.url;
+        commentEditContent.value = button.dataset.content;   // 기존 내용 채우기
+        commentEditDialog.showModal();
+    }
+</script>
 
 </body>
 </html>

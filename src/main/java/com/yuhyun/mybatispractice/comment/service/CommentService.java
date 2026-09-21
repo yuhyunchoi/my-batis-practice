@@ -10,7 +10,7 @@ import java.util.List;
 public interface CommentService {
     List<CommentResponse> findCommentsByBoardId(Long boarId);
 
-    CommentResponse createComment(CommentRequest commentRequest);
+    CommentResponse createComment(Long boardId, CommentRequest commentRequest);
 
     CommentResponse updateComment(Long commentId, CommentUpdateRequest commentRequest);
 
