@@ -39,8 +39,8 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="board : ${boards}">
-    <td class="num" th:text="${board.boardId}">1</td>
+  <tr th:each="board, stat : ${boards}">
+    <td class="num" th:text="${#lists.size(boards) - stat.index}">1</td>
     <td>
       <a th:href="@{/boards/{id}(id=${board.boardId})}"
          th:text="${board.title}">제목이 들어갑니다</a>

@@ -1,6 +1,5 @@
 package com.yuhyun.mybatispractice.board.domain;
 
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
