@@ -37,7 +37,7 @@ public class BoardController {
     public ResponseEntity<BoardResponse> createBoard(@Valid @RequestBody BoardRequest boardRequest) {
         BoardResponse created = boardService.createBoard(boardRequest);
 
-        return ResponseEntity.created(URI.create("/v1/api/boards" + created.boardId())).body(created);
+        return ResponseEntity.created(URI.create("/v1/api/boards/" + created.boardId())).body(created);
     }
 
     @PutMapping("/{board-id}")
