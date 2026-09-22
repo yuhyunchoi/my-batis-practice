@@ -20,4 +20,6 @@ public interface BoardMapper {
 
     int deleteById(Long boardId);
 
+    boolean existsById(Long boarId);
+
 }

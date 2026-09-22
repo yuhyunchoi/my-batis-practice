@@ -19,7 +19,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("{board-id}")
+    @GetMapping("/{board-id}")
     public List<CommentResponse> getCommentsByBoardId(@PathVariable(name = "board-id") Long boarId) {
         return commentService.findCommentsByBoardId(boarId);
     }
@@ -29,7 +29,7 @@ public class CommentController {
                                                          @RequestBody CommentRequest commentRequest) {
         CommentResponse response = commentService.createComment(boardId, commentRequest);
 
-        return ResponseEntity.created(URI.create("/v1/api/comment" + response.commentId())).body(response);
+        return ResponseEntity.created(URI.create("/v1/api/comments/" + response.commentId())).body(response);
     }
 
     @PutMapping("/{comment-id}")

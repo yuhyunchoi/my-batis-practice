@@ -85,15 +85,16 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
+    @Transactional
     public void deleteById(Long boardId, BoardDeleteRequest boardDeleteRequest) {
+        if (boardMapper.findById(boardId) == null) {
+            throw new BoardNotFoundException(boardId + "번 글을 삭제할 수 없습니다.");
+        }
+
         if (!passwordEncoder.matches(boardDeleteRequest.password(), boardMapper.findById(boardId).getPassword())) {
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
 
-        int affected = boardMapper.deleteById(boardId);
-
-        if (affected == 0) {
-            throw new BoardNotFoundException(boardId + "번 글을 삭제할 수 없습니다.");
-        }
+        boardMapper.deleteById(boardId);
     }
 }

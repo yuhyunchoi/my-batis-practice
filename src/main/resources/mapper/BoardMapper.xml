@@ -7,7 +7,7 @@
     <!-- SQL 문들이 여기 들어감 -->
     <!-- findAll-->
     <select id="findAll" resultType="com.yuhyun.mybatispractice.board.domain.Board">
-        select * from BOARD;
+        select * from BOARD order by BOARD_ID desc;
     </select>
 
     <!-- findByBoardId-->
@@ -37,5 +37,8 @@
         delete from BOARD where BOARD_ID = #{boardId}
     </delete>
 
+    <select id="existsById" resultType="boolean">
+        select COUNT(*) from BOARD where BOARD_ID = #{boardId}
+    </select>
 
 </mapper>
