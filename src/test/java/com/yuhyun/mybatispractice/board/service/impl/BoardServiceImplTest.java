@@ -1,14 +1,12 @@
 package com.yuhyun.mybatispractice.board.service.impl;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
+import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
+import com.yuhyun.mybatispractice.page.PageResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -213,13 +210,28 @@ class BoardServiceImplTest {
         // given
         BoardResponse newer = boardService.createBoard(
                 new BoardRequest("나중 글", "내용", "작성자", "1234"));
-
+        BoardSearchCondition condition = new BoardSearchCondition(null, 1, 10);
         // when
-        List<BoardResponse> boards = boardService.getAllBoard();
+        PageResponse<BoardResponse> result = boardService.getAllBoard(condition);
+
 
         // then
-        assertThat(boards.get(0).boardId()).isEqualTo(newer.boardId());
-        assertThat(boards.get(0).title()).isEqualTo("나중 글");
+        assertThat(result.content().get(0).boardId()).isEqualTo(newer.boardId());
+    }
+
+    @Test
+    void 검색하면_전체건수도_검색조건을_따른다() {
+        //given
+        boardService.createBoard(new BoardRequest("공지1", "내용", "최준용", "1234"));
+        boardService.createBoard(new BoardRequest("공지2", "내용", "김진욱", "1234"));
+
+        //when
+        PageResponse<BoardResponse> result
+                = boardService.getAllBoard(new BoardSearchCondition("공지", 1, 10));
+
+        //then
+        assertThat(result.content()).hasSize(2);
+        assertThat(result.pageInfo().totalCount()).isEqualTo(2);
     }
 
 }

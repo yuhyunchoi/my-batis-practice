@@ -22,7 +22,7 @@ public class BoardController {
 
 
     @GetMapping
-    public PageResponse<BoardResponse> getAllBoards(@RequestBody BoardSearchCondition condition) {
+    public PageResponse<BoardResponse> getAllBoards(@ModelAttribute BoardSearchCondition condition) {
         return boardService.getAllBoard(condition);
     }
 

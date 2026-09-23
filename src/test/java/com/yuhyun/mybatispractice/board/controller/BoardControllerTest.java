@@ -7,6 +7,8 @@ import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
+import com.yuhyun.mybatispractice.page.PageInfo;
+import com.yuhyun.mybatispractice.page.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BoardController.class)
@@ -112,15 +115,21 @@ class BoardControllerTest {
                 new BoardResponse(1L, "첫 번째", "내용", "홍길동",
                         LocalDateTime.now(), LocalDateTime.now(),3)
         );
-        given(boardService.getAllBoard()).willReturn(boards);
+        PageResponse<BoardResponse> pageResponse =
+                new PageResponse<>(boards, PageInfo.of(1, 10, 2));
+
+        given(boardService.getAllBoard(any())).willReturn(pageResponse);
 
         // when & then
         mockMvc.perform(get("/v1/api/boards"))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("두 번째"))
-                .andExpect(jsonPath("$[1].title").value("첫 번째"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].title").value("두 번째"))
+                .andExpect(jsonPath("$.pageInfo.totalCount").value(2))
+                .andExpect(jsonPath("$.pageInfo.totalPages").value(1));
+
     }
 
     @Test
