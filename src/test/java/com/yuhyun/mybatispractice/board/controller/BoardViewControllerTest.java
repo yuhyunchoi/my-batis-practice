@@ -6,6 +6,8 @@ import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentResponse;
 import com.yuhyun.mybatispractice.comment.service.CommentService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
+import com.yuhyun.mybatispractice.page.PageInfo;
+import com.yuhyun.mybatispractice.page.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +51,13 @@ class BoardViewControllerTest {
     @Test
     void 목록을_요청하면_boards가_모델에_담긴다() throws Exception {
         //given
-        given(boardService.getAllBoard()).willReturn(List.of(boardResponse));
+        given(boardService.getAllBoard(any()))
+                .willReturn(new PageResponse<>(List.of(boardResponse), PageInfo.of(1, 10, 1)));
 
         //when&given
         mockMvc.perform(get("/boards"))
-                .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
-                .andExpect(model().attributeExists("boards"));
+                .andExpect(model().attributeExists("result", "condition"));
     }
 
     @Test
