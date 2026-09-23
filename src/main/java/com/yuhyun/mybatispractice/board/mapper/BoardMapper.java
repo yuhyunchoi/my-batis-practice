@@ -1,6 +1,7 @@
 package com.yuhyun.mybatispractice.board.mapper;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
+import com.yuhyun.mybatispractice.board.domain.dto.BoardSearchCondition;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.List;
 @Mapper
 public interface BoardMapper {
 
-    List<Board> findAll();
+    List<Board> findAll(BoardSearchCondition condition);
+
+    long countAll(BoardSearchCondition condition);
 
     Board findById(Long boardId);
 

@@ -22,3 +22,7 @@ mybatis:
     map-underscore-to-camel-case: true
     arg-name-based-constructor-auto-mapping: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    org.springframework.web: debug

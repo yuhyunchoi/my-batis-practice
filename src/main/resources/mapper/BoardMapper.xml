@@ -3,11 +3,28 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.yuhyun.mybatispractice.board.mapper.BoardMapper">
+    <!-- 검색 조건 조각 — findAll, countAll 이 같이 씀 -->
+    <sql id="searchCondition">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                TITLE LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </sql>
 
     <!-- SQL 문들이 여기 들어감 -->
     <!-- findAll-->
     <select id="findAll" resultType="com.yuhyun.mybatispractice.board.domain.Board">
-        select * from BOARD order by BOARD_ID desc;
+        select * from BOARD
+        <include refid="searchCondition"/>
+        order by BOARD_ID desc
+        limit #{size} offset #{offset}
+    </select>
+
+    <!-- countAll-->
+    <select id="countAll" resultType="long">
+        select count(*) from BOARD
+        <include refid="searchCondition"/>
     </select>
 
     <!-- findByBoardId-->
@@ -40,5 +57,6 @@
     <select id="existsById" resultType="boolean">
         select COUNT(*) from BOARD where BOARD_ID = #{boardId}
     </select>
+
 
 </mapper>

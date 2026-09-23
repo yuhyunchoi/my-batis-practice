@@ -1,9 +1,6 @@
 package com.yuhyun.mybatispractice.board.controller;
 
-import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
+import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentDeleteRequest;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentRequest;
@@ -27,11 +24,9 @@ public class BoardViewController {
     private final CommentService commentService;
 
     @GetMapping
-    public String listView(Model model) {
-        List<BoardResponse> boards = boardService.getAllBoard();
-
-        model.addAttribute("boards", boards);
-
+    public String listView(@ModelAttribute BoardSearchCondition condition, Model model) {
+        model.addAttribute("result", boardService.getAllBoard(condition));
+        model.addAttribute("condition", condition);
         return "boards/list";
     }
 

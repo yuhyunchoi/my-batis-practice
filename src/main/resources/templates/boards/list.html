@@ -9,8 +9,18 @@
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     h1 { font-size: 24px; margin: 0; }
     .btn { display: inline-block; padding: 9px 18px; background: #1a1a1a; color: #fff;
-      text-decoration: none; border-radius: 6px; font-size: 14px; }
+      text-decoration: none; border-radius: 6px; font-size: 14px; border: none;
+      cursor: pointer; font-family: inherit; }
     .btn:hover { background: #333; }
+
+    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-bar input {
+      flex: 1; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px;
+      font-size: 14px; font-family: inherit;
+    }
+    .search-bar input:focus { outline: none; border-color: #1a1a1a; }
+
+    .total { font-size: 13px; color: #888; margin-bottom: 8px; }
 
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 12px 8px; border-bottom: 1px solid #e5e5e5; text-align: left; }
@@ -19,6 +29,14 @@
     td a:hover { text-decoration: underline; }
     .num { width: 60px; color: #999; }
     .empty { text-align: center; color: #999; padding: 40px 0; }
+
+    .pagination { display: flex; gap: 4px; justify-content: center; margin-top: 24px; }
+    .pagination a {
+      padding: 7px 12px; border: 1px solid #e5e5e5; border-radius: 6px;
+      color: #666; text-decoration: none; font-size: 14px;
+    }
+    .pagination a:hover { background: #fafafa; }
+    .pagination a.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
   </style>
 </head>
 <body>
@@ -27,6 +45,14 @@
   <h1>게시글 목록</h1>
   <a class="btn" th:href="@{/boards/new}">글쓰기</a>
 </div>
+
+<form class="search-bar" method="get" th:action="@{/boards}">
+  <input type="text" name="keyword" th:value="${condition.keyword}"
+         placeholder="제목으로 검색" maxlength="50">
+  <button type="submit" class="btn">검색</button>
+</form>
+
+<div class="total" th:text="'전체 ' + ${result.pageInfo.totalCount} + '건'">전체 0건</div>
 
 <table>
   <thead>
@@ -39,8 +65,9 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="board, stat : ${boards}">
-    <td class="num" th:text="${#lists.size(boards) - stat.index}">1</td>
+  <tr th:each="board, stat : ${result.content}">
+    <td class="num"
+        th:text="${result.pageInfo.totalCount - (result.pageInfo.page - 1) * result.pageInfo.size - stat.index}">1</td>
     <td>
       <a th:href="@{/boards/{id}(id=${board.boardId})}"
          th:text="${board.title}">제목이 들어갑니다</a>
@@ -49,11 +76,24 @@
     <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd')}">2026-01-01</td>
     <td th:text="${board.viewCount}">0</td>
   </tr>
-  <tr th:if="${#lists.isEmpty(boards)}">
+  <tr th:if="${#lists.isEmpty(result.content)}">
     <td colspan="5" class="empty">등록된 글이 없습니다.</td>
   </tr>
   </tbody>
 </table>
+
+<nav class="pagination" th:if="${result.pageInfo.totalCount > 0}">
+  <a th:if="${result.pageInfo.hasPrev}"
+     th:href="@{/boards(page=${result.pageInfo.startPage - 1}, keyword=${condition.keyword})}">←</a>
+
+  <a th:each="p : ${#numbers.sequence(result.pageInfo.startPage, result.pageInfo.endPage)}"
+     th:href="@{/boards(page=${p}, keyword=${condition.keyword})}"
+     th:text="${p}"
+     th:classappend="${p == result.pageInfo.page} ? 'active'">1</a>
+
+  <a th:if="${result.pageInfo.hasNext}"
+     th:href="@{/boards(page=${result.pageInfo.endPage + 1}, keyword=${condition.keyword})}">→</a>
+</nav>
 
 </body>
 </html>

@@ -1,10 +1,8 @@
 package com.yuhyun.mybatispractice.board.controller;
 
-import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
+import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.service.BoardService;
+import com.yuhyun.mybatispractice.page.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +22,8 @@ public class BoardController {
 
 
     @GetMapping
-    public List<BoardResponse> getAllBoards(){
-        return boardService.getAllBoard();
+    public PageResponse<BoardResponse> getAllBoards(@RequestBody BoardSearchCondition condition) {
+        return boardService.getAllBoard(condition);
     }
 
     @GetMapping("/{board-id}")
