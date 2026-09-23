@@ -171,9 +171,4 @@ class BoardViewControllerTest {
                 .andExpect(model().attributeExists("board"))
                 .andExpect(model().attribute("board", boardResponse));
     }
-
-
-    /**
-     * 수정_폼을_요청하면_board가_모델에_담긴다           → get("/boards/1/edit")
-     */
 }
