@@ -1,14 +1,13 @@
 package com.yuhyun.mybatispractice.board.service.impl;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardDeleteRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardRequest;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardResponse;
-import com.yuhyun.mybatispractice.board.domain.dto.BoardUpdateRequest;
+import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
+import com.yuhyun.mybatispractice.page.PageInfo;
+import com.yuhyun.mybatispractice.page.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,12 +26,17 @@ public class BoardServiceImpl implements BoardService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<BoardResponse> getAllBoard() {
-        List<Board> boardList = boardMapper.findAll();
+    public PageResponse<BoardResponse> getAllBoard(BoardSearchCondition condition) {
+        List<Board> boardList = boardMapper.findAll(condition);
+        long totalCount = boardMapper.countAll(condition);
 
-        return boardList.stream()
+        List<BoardResponse> content = boardList.stream()
                 .map(BoardResponse::from)
                 .toList();
+
+        PageInfo pageInfo = PageInfo.of(condition.page(), condition.size(), totalCount);
+
+        return new PageResponse<>(content, pageInfo);
     }
 
     @Override

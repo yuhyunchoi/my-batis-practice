@@ -172,4 +172,16 @@ class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void 댓글_내용이_비어있으면_400이_반환된다() throws Exception {
+        CommentRequest request = new CommentRequest("", "홍길동", "1234");
+
+        mockMvc.perform(post("/v1/api/comments/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(commentService, never()).createComment(any(), any());
+    }
 }

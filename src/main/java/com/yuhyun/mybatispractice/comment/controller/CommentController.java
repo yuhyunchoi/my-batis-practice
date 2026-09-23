@@ -5,6 +5,7 @@ import com.yuhyun.mybatispractice.comment.domain.dto.CommentRequest;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentResponse;
 import com.yuhyun.mybatispractice.comment.domain.dto.CommentUpdateRequest;
 import com.yuhyun.mybatispractice.comment.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class CommentController {
 
     @PostMapping("/{board-id}")
     public ResponseEntity<CommentResponse> createComment(@PathVariable(name = "board-id") Long boardId,
-                                                         @RequestBody CommentRequest commentRequest) {
+                                                         @Valid @RequestBody CommentRequest commentRequest) {
         CommentResponse response = commentService.createComment(boardId, commentRequest);
 
         return ResponseEntity.created(URI.create("/v1/api/comments/" + response.commentId())).body(response);
@@ -34,7 +35,7 @@ public class CommentController {
 
     @PutMapping("/{comment-id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable(name = "comment-id") Long commentId,
-                                                         @RequestBody CommentUpdateRequest commentRequest) {
+                                                         @Valid @RequestBody CommentUpdateRequest commentRequest) {
         CommentResponse updated = commentService.updateComment(commentId, commentRequest);
 
         return ResponseEntity.ok(updated);
@@ -42,7 +43,7 @@ public class CommentController {
 
     @DeleteMapping("/{comment-id}")
     public ResponseEntity<Void> deleteComment(@PathVariable(name = "comment-id") Long commentId,
-                                              @RequestBody CommentDeleteRequest request) {
+                                              @Valid @RequestBody CommentDeleteRequest request) {
         commentService.deleteByCommentId(commentId, request);
 
         return ResponseEntity.noContent().build();
