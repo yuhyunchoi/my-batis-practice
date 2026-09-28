@@ -58,5 +58,8 @@
         select COUNT(*) from BOARD where BOARD_ID = #{boardId}
     </select>
 
+    <update id="updateSummary">
+        UPDATE BOARD SET SUMMARY = #{summary} WHERE BOARD_ID = #{boardId}
+    </update>
 
 </mapper>

@@ -10,6 +10,10 @@
         h1 { font-size: 26px; margin: 0 0 12px; line-height: 1.4; }
         .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: #888;
             padding-bottom: 16px; border-bottom: 2px solid #1a1a1a; }
+        .summary { background: #f7f7f8; border-radius: 8px; padding: 14px 16px; margin-top: 20px; }
+        .summary-label { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .5px; }
+        .summary p { margin: 6px 0 0; font-size: 14px; color: #555; line-height: 1.6; }
+
         .content { padding: 32px 4px; line-height: 1.8; white-space: pre-wrap;
             border-bottom: 1px solid #e5e5e5; min-height: 200px; }
         .footer { padding-top: 16px; font-size: 13px; color: #aaa; }
@@ -85,6 +89,14 @@
     <span th:text="${board.writer}">작성자</span>
     <span th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
     <span th:text="'조회 ' + ${board.viewCount}">조회 0</span>
+</div>
+
+<div class="summary" th:if="${board.summary != null}">
+    <span class="summary-label">AI 요약</span>
+    <p th:text="${board.summary}"></p>
+</div>
+<div th:if="${board.summary == null}" class="summary pending">
+    요약 생성 중...
 </div>
 
 <div class="content" th:text="${board.content}">

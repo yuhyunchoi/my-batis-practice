@@ -11,7 +11,8 @@ public record BoardResponse(
         String writer,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        int viewCount
+        int viewCount,
+        String summary
 ) {
     public static BoardResponse from(Board board) {
         return new BoardResponse(
@@ -21,7 +22,8 @@ public record BoardResponse(
                 board.getWriter(),
                 board.getCreatedAt(),
                 board.getModifiedAt(),
-                board.getViewCount()
+                board.getViewCount(),
+                board.getSummary()
         );
     }
 }

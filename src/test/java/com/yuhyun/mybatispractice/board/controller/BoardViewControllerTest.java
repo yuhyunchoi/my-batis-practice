@@ -42,7 +42,7 @@ class BoardViewControllerTest {
     @BeforeEach
     void setUp() {
         boardResponse = new BoardResponse(1L, "제목", "내용", "최유현",
-                LocalDateTime.now(), LocalDateTime.now(), 5);
+                LocalDateTime.now(), LocalDateTime.now(), 5, null);
         commentResponse = new CommentResponse(
                 7L, 1L, "댓글 내용", "홍길동",
                 LocalDateTime.now(), LocalDateTime.now());

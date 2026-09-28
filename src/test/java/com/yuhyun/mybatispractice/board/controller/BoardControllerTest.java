@@ -48,7 +48,7 @@ class BoardControllerTest {
     void setUp() {
         response = new BoardResponse(
                 1L, "제목", "내용", "최유현",
-                LocalDateTime.now(), LocalDateTime.now(),0);
+                LocalDateTime.now(), LocalDateTime.now(),0, null);
     }
 
     @Test
@@ -79,7 +79,7 @@ class BoardControllerTest {
 
         BoardResponse response = new BoardResponse(
                 2L, "새 제목", "새 내용", "새 작성자",
-                LocalDateTime.now(), LocalDateTime.now(), 0);
+                LocalDateTime.now(), LocalDateTime.now(), 0, null);
 
         given(boardService.createBoard(any())).willReturn(response);
 
@@ -111,9 +111,9 @@ class BoardControllerTest {
         // given
         List<BoardResponse> boards = List.of(
                 new BoardResponse(2L, "두 번째", "내용", "최유현",
-                        LocalDateTime.now(), LocalDateTime.now(),5),
+                        LocalDateTime.now(), LocalDateTime.now(),5, null),
                 new BoardResponse(1L, "첫 번째", "내용", "홍길동",
-                        LocalDateTime.now(), LocalDateTime.now(),3)
+                        LocalDateTime.now(), LocalDateTime.now(),3, null)
         );
         PageResponse<BoardResponse> pageResponse =
                 new PageResponse<>(boards, PageInfo.of(1, 10, 2));
@@ -139,7 +139,7 @@ class BoardControllerTest {
 
         BoardResponse response = new BoardResponse(
                 1L, "제목 수정", "내용 수정", "최유현",
-                LocalDateTime.now(), LocalDateTime.now(),3);
+                LocalDateTime.now(), LocalDateTime.now(), 3, null);
 
         given(boardService.updateBoard(eq(1L), any())).willReturn(response);
 

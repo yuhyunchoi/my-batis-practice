@@ -18,6 +18,7 @@ public class Board {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private int viewCount;
+    private String summary;
 
 
     public static Board of(String title, String content, String password, String writer) {
@@ -28,7 +29,8 @@ public class Board {
                 writer,
                 null,
                 null,
-                0);
+                0,
+                null);
     }
 
 }
