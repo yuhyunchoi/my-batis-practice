@@ -1,6 +1,7 @@
 package com.yuhyun.mybatispractice.board.service.impl;
 
 import com.yuhyun.mybatispractice.board.domain.Board;
+import com.yuhyun.mybatispractice.board.domain.SortType;
 import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
 import com.yuhyun.mybatispractice.board.service.BoardService;
@@ -210,7 +211,7 @@ class BoardServiceImplTest {
         // given
         BoardResponse newer = boardService.createBoard(
                 new BoardRequest("나중 글", "내용", "작성자", "1234"));
-        BoardSearchCondition condition = new BoardSearchCondition(null, 1, 10);
+        BoardSearchCondition condition = new BoardSearchCondition(null, SortType.LATEST, 1, 10);
         // when
         PageResponse<BoardResponse> result = boardService.getAllBoard(condition);
 
@@ -227,7 +228,7 @@ class BoardServiceImplTest {
 
         //when
         PageResponse<BoardResponse> result
-                = boardService.getAllBoard(new BoardSearchCondition("공지", 1, 10));
+                = boardService.getAllBoard(new BoardSearchCondition("공지",  SortType.LATEST,1, 10));
 
         //then
         assertThat(result.content()).hasSize(2);

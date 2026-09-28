@@ -50,6 +50,11 @@
   <input type="text" name="keyword" th:value="${condition.keyword}"
          placeholder="제목으로 검색" maxlength="50">
   <button type="submit" class="btn">검색</button>
+  <select name="sortType">
+    <option value="LATEST" th:selected="${condition.sortType.name() == 'LATEST'}">최신순</option>
+    <option value="OLDEST" th:selected="${condition.sortType.name() == 'OLDEST'}">오래된순</option>
+    <option value="VIEW"   th:selected="${condition.sortType.name() == 'VIEW'}">조회순</option>
+  </select>
 </form>
 
 <div class="total" th:text="'전체 ' + ${result.pageInfo.totalCount} + '건'">전체 0건</div>
@@ -87,7 +92,7 @@
      th:href="@{/boards(page=${result.pageInfo.startPage - 1}, keyword=${condition.keyword})}">←</a>
 
   <a th:each="p : ${#numbers.sequence(result.pageInfo.startPage, result.pageInfo.endPage)}"
-     th:href="@{/boards(page=${p}, keyword=${condition.keyword})}"
+     th:href="@{/boards(page=${p}, keyword=${condition.keyword}, sortType=${condition.sortType})}"
      th:text="${p}"
      th:classappend="${p == result.pageInfo.page} ? 'active'">1</a>
 
