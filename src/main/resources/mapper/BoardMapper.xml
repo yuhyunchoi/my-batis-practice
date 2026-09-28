@@ -17,7 +17,7 @@
     <select id="findAll" resultType="com.yuhyun.mybatispractice.board.domain.Board">
         select * from BOARD
         <include refid="searchCondition"/>
-        order by BOARD_ID desc
+        order by ${sortType.column} ${sortType.direction}, BOARD_ID desc
         limit #{size} offset #{offset}
     </select>
 
