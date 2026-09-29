@@ -3,6 +3,8 @@ package com.yuhyun.mybatispractice.board.controller;
 import com.yuhyun.mybatispractice.board.domain.dto.*;
 import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.page.PageResponse;
+import com.yuhyun.mybatispractice.summary.BoardSummaryService;
+import com.yuhyun.mybatispractice.summary.SummaryClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardSummaryService boardSummaryService;
 
 
     @GetMapping
@@ -27,7 +30,7 @@ public class BoardController {
     }
 
     @GetMapping("/{board-id}")
-    public BoardResponse getBoardById(@PathVariable(name ="board-id") Long boarId) {
+    public BoardResponse getBoardById(@PathVariable(name = "board-id") Long boarId) {
         return boardService.findByBoardId(boarId);
     }
 
@@ -39,7 +42,7 @@ public class BoardController {
     }
 
     @PutMapping("/{board-id}")
-    public ResponseEntity<BoardResponse> updateBoard(@PathVariable(name = "board-id") Long boardId,@Valid @RequestBody BoardUpdateRequest boardRequest) {
+    public ResponseEntity<BoardResponse> updateBoard(@PathVariable(name = "board-id") Long boardId, @Valid @RequestBody BoardUpdateRequest boardRequest) {
         BoardResponse updated = boardService.updateBoard(boardId, boardRequest);
 
         return ResponseEntity.ok(updated);
@@ -53,5 +56,9 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{board-id}/summary")
+    public SummaryResponse recreateSummary(@PathVariable(name = "board-id") Long boardId) {
+        return new SummaryResponse(boardSummaryService.regenerate(boardId).orElse(null));
+    }
 
 }

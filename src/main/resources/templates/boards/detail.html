@@ -91,12 +91,17 @@
     <span th:text="'조회 ' + ${board.viewCount}">조회 0</span>
 </div>
 
-<div class="summary" th:if="${board.summary != null}">
+<div class="summary"
+     th:classappend="${board.summary == null} ? ' pending' : ''"
+     id="summary-box">
     <span class="summary-label">AI 요약</span>
-    <p th:text="${board.summary}"></p>
-</div>
-<div th:if="${board.summary == null}" class="summary pending">
-    요약 생성 중...
+    <p id="summary-text"
+       th:text="${board.summary} ?: '아직 요약이 없습니다.'"></p>
+    <button type="button"
+            id="regenerate-btn"
+            th:attr="data-board-id=${board.boardId}">
+        요약 다시 생성
+    </button>
 </div>
 
 <div class="content" th:text="${board.content}">
@@ -207,4 +212,43 @@
 </script>
 
 </body>
+<script>
+    document.getElementById('regenerate-btn').addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        const boardId = button.dataset.boardId;
+        const summaryBox = document.getElementById('summary-box');
+        const summaryText = document.getElementById('summary-text');
+
+        // 눌린 걸 즉시 보여준다
+        const originalLabel = button.textContent;
+        button.disabled = true;
+        button.textContent = '생성 중...';
+        summaryText.textContent = '요약을 만들고 있습니다...';
+        summaryBox.classList.add('pending');
+
+        try {
+            const response = await fetch(`/v1/api/boards/${boardId}/summary`, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (!response.ok) {
+                throw new Error(`서버 응답 오류 (${response.status})`);
+            }
+
+            const data = await response.json();
+            summaryText.textContent = data.summary ?? '요약을 생성하지 못했습니다.';
+            summaryBox.classList.toggle('pending', !data.summary);
+
+        } catch (error) {
+            console.error('요약 재생성 실패', error);
+            summaryText.textContent = '요약 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+            summaryBox.classList.add('pending');
+
+        } finally {
+            button.disabled = false;
+            button.textContent = originalLabel;
+        }
+    });
+</script>
 </html>

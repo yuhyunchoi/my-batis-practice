@@ -1,10 +1,16 @@
 package com.yuhyun.mybatispractice.summary;
 
+import com.yuhyun.mybatispractice.board.domain.Board;
+import com.yuhyun.mybatispractice.board.domain.dto.SummaryResponse;
 import com.yuhyun.mybatispractice.board.mapper.BoardMapper;
+import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,4 +30,18 @@ public class BoardSummaryService {
             log.warn("요약 생성 실패 ", e);
         }
     }
+
+    @Transactional
+    public Optional<String> regenerate(Long boardId) {
+        Board board = boardMapper.findById(boardId);
+        if (board == null) {
+            throw new BoardNotFoundException("해당 게시글이 존재하지 않습니다.");
+        }
+
+        Optional<String> result = summaryClient.summarize(board.getContent());
+        result.ifPresent(s -> boardMapper.updateSummary(boardId, s));
+        return result;
+
+    }
+
 }
