@@ -46,7 +46,7 @@ H2 인메모리 DB를 쓰므로 별도 설치가 필요 없고, 시작 시 샘�
 [Ollama](https://ollama.com) 설치 후:
 
 ```bash
-ollama pull qwen2.5:3b
+ollama pull qwen2.5:7b
 ```
 
 `application.yaml`에서 모델을 바꿀 수 있다.
@@ -54,7 +54,7 @@ ollama pull qwen2.5:3b
 ```yaml
 ollama:
   base-url: http://localhost:11434
-  model: qwen2.5:3b
+  model: qwen2.5:7b
 ```
 
 Ollama가 없어도 애플리케이션은 정상 동작한다. 요약만 생성되지 않는다.
