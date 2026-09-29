@@ -20,3 +20,7 @@ mybatis:
 logging:
   level:
     com.yuhyun.mybatispractice: debug
+
+ollama:
+  base-url: http://localhost:11434
+  model: qwen2.5:3b
