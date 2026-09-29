@@ -3,6 +3,7 @@ package com.yuhyun.mybatispractice.board.mapper;
 import com.yuhyun.mybatispractice.board.domain.Board;
 import com.yuhyun.mybatispractice.board.domain.dto.BoardSearchCondition;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,5 +25,7 @@ public interface BoardMapper {
     int deleteById(Long boardId);
 
     boolean existsById(Long boarId);
+
+    void updateSummary(@Param("boardId") Long boarId, @Param("summary") String summary);
 
 }

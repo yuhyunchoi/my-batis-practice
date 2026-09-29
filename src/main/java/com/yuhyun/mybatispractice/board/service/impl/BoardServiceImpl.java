@@ -8,6 +8,8 @@ import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
 import com.yuhyun.mybatispractice.page.PageInfo;
 import com.yuhyun.mybatispractice.page.PageResponse;
+import com.yuhyun.mybatispractice.summary.BoardSummaryService;
+import com.yuhyun.mybatispractice.summary.SummaryClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,7 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
     private final BoardMapper boardMapper;
     private final PasswordEncoder passwordEncoder;
+    private final BoardSummaryService boardSummaryService;
 
     @Override
     public PageResponse<BoardResponse> getAllBoard(BoardSearchCondition condition) {
@@ -43,7 +46,6 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public BoardResponse findByBoardId(Long boardId) {
         boardMapper.increaseViewCount(boardId);Board target = boardMapper.findById(boardId);
-
 
         if (target == null) {
             throw new BoardNotFoundException(boardId);
@@ -65,6 +67,8 @@ public class BoardServiceImpl implements BoardService {
         boardMapper.insert(createdBoard);
 
         Board saved = boardMapper.findById(createdBoard.getBoardId());
+        boardSummaryService.generateSummaryAsync(saved.getBoardId(), saved.getContent());
+
         return BoardResponse.from(saved);
     }
 
