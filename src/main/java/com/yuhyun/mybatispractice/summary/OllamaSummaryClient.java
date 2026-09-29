@@ -19,7 +19,7 @@ public class OllamaSummaryClient implements SummaryClient {
     private static final String PROMPT = """
             다음 글을 한글 세 문장으로 간단하게 요약해줘. 요약문만 출력하고 다른 말은 하지마 \n\n
             """;
-    private static final Duration READ_TIMEOUT = Duration.ofSeconds(120);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
 
     private final RestClient restClient;
     private final String model;
