@@ -8,12 +8,14 @@ import com.yuhyun.mybatispractice.board.service.BoardService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
 import com.yuhyun.mybatispractice.page.PageResponse;
+import com.yuhyun.mybatispractice.summary.BoardSummaryService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
@@ -31,6 +34,9 @@ class BoardServiceImplTest {
 
     @Autowired
     BoardMapper boardMapper;
+
+    @MockitoBean
+    BoardSummaryService boardSummaryService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -45,6 +51,7 @@ class BoardServiceImplTest {
                         "최유현",
                         "1234");
         savedBoardId = boardService.createBoard(request).boardId();
+        clearInvocations(boardSummaryService);
     }
 
     @Test
@@ -235,4 +242,23 @@ class BoardServiceImplTest {
         assertThat(result.pageInfo().totalCount()).isEqualTo(2);
     }
 
+    @Test
+    void 내용을_수정하면_요약을_다시_생성한다() {
+        // when
+        BoardUpdateRequest request = new BoardUpdateRequest("테스트 제목", "새 내용", "1234");
+        boardService.updateBoard(savedBoardId, request);
+
+        // then
+        verify(boardSummaryService).generateSummaryAsync(savedBoardId, "새 내용");
+    }
+
+    @Test
+    void 제목만_수정하면_요약을_다시_생성하지_않는다() {
+        // when: 제목만 바꾸고 내용은 "테스트 내용" 그대로
+        BoardUpdateRequest request = new BoardUpdateRequest("새 제목", "테스트 내용", "1234");
+        boardService.updateBoard(savedBoardId, request);
+
+        // then: verify(boardSummaryService, never()).generateSummaryAsync(any(), any());
+        verify(boardSummaryService, never()).generateSummaryAsync(any(), any());
+    }
 }

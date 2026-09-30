@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -78,6 +79,12 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest) {
         Board origin = boardMapper.findById(boardId);
 
+        if (origin == null) {
+            throw new BoardNotFoundException("해당 게시글을 찾을 수 없습니다.");
+        }
+
+        boolean contentChanged = !Objects.equals(origin.getContent(), boardRequest.content());
+
         if (!passwordEncoder.matches(boardRequest.password(), origin.getPassword())) {
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
@@ -88,6 +95,10 @@ public class BoardServiceImpl implements BoardService {
         boardMapper.update(origin);
 
         Board updated = boardMapper.findById(boardId);
+
+        if (contentChanged) {
+            boardSummaryService.generateSummaryAsync(boardId, updated.getContent());
+        }
 
         return BoardResponse.from(updated);
     }
