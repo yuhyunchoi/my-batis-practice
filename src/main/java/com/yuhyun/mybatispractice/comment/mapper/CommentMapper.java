@@ -17,5 +17,10 @@ public interface CommentMapper {
 
     int update(Comment comment);
 
-    int deleteById(Long commentId);
+    int deleteByIdHard(Long commentId);
+
+    int deleteByIdSoft(Long commentId);
+
+    boolean existsByParentId(Long parentId);
+
 }

@@ -8,7 +8,7 @@ import com.yuhyun.mybatispractice.comment.domain.dto.CommentUpdateRequest;
 import java.util.List;
 
 public interface CommentService {
-    List<CommentResponse> findCommentsByBoardId(Long boarId);
+    List<CommentResponse> findCommentsByBoardId(Long boardId);
 
     CommentResponse createComment(Long boardId, CommentRequest commentRequest);
 

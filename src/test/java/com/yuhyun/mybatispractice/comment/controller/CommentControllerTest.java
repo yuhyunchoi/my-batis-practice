@@ -48,7 +48,7 @@ class CommentControllerTest {
     void setUp() {
         commentResponse = new CommentResponse(
                 7L, 1L, "댓글 내용", "조병현",
-                LocalDateTime.now(), LocalDateTime.now()
+                LocalDateTime.now(), LocalDateTime.now(), null, Boolean.FALSE
         );
     }
 
@@ -70,7 +70,7 @@ class CommentControllerTest {
     @Test
     void 댓글을_등록하면_201과_Location_헤더가_반환된다() throws Exception {
         // given
-        CommentRequest request = new CommentRequest("댓글 내용", "홍길동", "1234");
+        CommentRequest request = new CommentRequest("댓글 내용", "홍길동", "1234", null);
         given(commentService.createComment(eq(1L), any())).willReturn(commentResponse);
 
         // when & then
@@ -85,7 +85,7 @@ class CommentControllerTest {
     @Test
     void 없는_게시글에_댓글을_달면_404가_반환된다() throws Exception {
         // given
-        CommentRequest request = new CommentRequest("댓글 내용", "노시환", "1234");
+        CommentRequest request = new CommentRequest("댓글 내용", "노시환", "1234", null);
         given(commentService.createComment(eq(9999L), any()))
                 .willThrow(new BoardNotFoundException("해당 글을 찾을 수 없습니다."));
 
@@ -103,7 +103,7 @@ class CommentControllerTest {
 
         CommentResponse updated = new CommentResponse(
                 7L, 1L, "수정된 댓글", "조병현",
-                LocalDateTime.now(), LocalDateTime.now());
+                LocalDateTime.now(), LocalDateTime.now(), null, Boolean.FALSE);
 
         given(commentService.updateComment(eq(7L), any())).willReturn(updated);
 
@@ -175,7 +175,7 @@ class CommentControllerTest {
 
     @Test
     void 댓글_내용이_비어있으면_400이_반환된다() throws Exception {
-        CommentRequest request = new CommentRequest("", "홍길동", "1234");
+        CommentRequest request = new CommentRequest("", "홍길동", "1234", null);
 
         mockMvc.perform(post("/v1/api/comments/1")
                         .contentType(MediaType.APPLICATION_JSON)

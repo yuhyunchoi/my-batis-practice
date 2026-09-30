@@ -10,9 +10,17 @@
         h1 { font-size: 26px; margin: 0 0 12px; line-height: 1.4; }
         .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: #888;
             padding-bottom: 16px; border-bottom: 2px solid #1a1a1a; }
+
+        /* ===== AI 요약 ===== */
         .summary { background: #f7f7f8; border-radius: 8px; padding: 14px 16px; margin-top: 20px; }
+        .summary-top { display: flex; justify-content: space-between; align-items: center; }
         .summary-label { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .5px; }
         .summary p { margin: 6px 0 0; font-size: 14px; color: #555; line-height: 1.6; }
+        .summary.pending p { color: #aaa; font-style: italic; }
+        .summary-regen { background: none; border: none; padding: 0; cursor: pointer;
+            font-family: inherit; font-size: 12px; color: #999; }
+        .summary-regen:hover { color: #1a1a1a; }
+        .summary-regen:disabled { cursor: default; opacity: .6; }
 
         .content { padding: 32px 4px; line-height: 1.8; white-space: pre-wrap;
             border-bottom: 1px solid #e5e5e5; min-height: 200px; }
@@ -26,6 +34,7 @@
         .btn-delete { background: #fff; color: #c92a2a; border: 1px solid #ffc9c9; }
         .btn-delete:hover { background: #fff5f5; }
 
+        /* ===== 모달 ===== */
         dialog {
             border: none; border-radius: 12px; padding: 28px 32px; width: 340px;
             box-shadow: 0 12px 40px rgba(0,0,0,.18);
@@ -50,15 +59,30 @@
         }
         .dialog-wide textarea:focus { outline: none; border-color: #1a1a1a; }
 
+        /* ===== 댓글 ===== */
         .comments { margin-top: 48px; }
-        .comments h2 { font-size: 17px; margin: 0 0 16px; }
-        .comment-list { list-style: none; padding: 0; margin: 0 0 28px; }
-        .comment-list li { padding: 16px 4px; border-bottom: 1px solid #f0f0f0; }
-        .comment-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .comments h2 { font-size: 17px; margin: 0 0 8px; }
+        .comment-list { list-style: none; padding: 0; margin: 0 0 28px; border-bottom: 1px solid #f0f0f0; }
+
+        /* 구분선은 "댓글 묶음(부모 + 답글)" 사이에만 */
+        .comment-item { padding: 16px 4px; }
+        .comment-item:not(.reply) { border-top: 1px solid #f0f0f0; }
+        .comment-list > .comment-item:first-child { border-top: none; }
+
+        /* 답글: 들여쓰기 + 얇은 스레드 라인 */
+        .comment-item.reply {
+            margin-left: 28px;
+            padding: 10px 4px 10px 16px;
+            border-left: 2px solid #eee;
+        }
+        .comment-item.reply .comment-content { font-size: 14px; }
+
+        .comment-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
         .comment-writer { font-weight: 600; font-size: 14px; }
         .comment-date { font-size: 13px; color: #aaa; }
         .comment-content { margin: 0; font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
-        .comment-empty { color: #aaa; font-size: 14px; text-align: center; padding: 28px 0 !important; }
+        .comment-deleted { margin: 0; font-size: 14px; color: #aaa; font-style: italic; }
+        .comment-empty { color: #aaa; font-size: 14px; text-align: center; padding: 28px 0 !important; border-top: none !important; }
 
         .comment-btn { background: none; border: none; cursor: pointer;
             color: #bbb; font-size: 13px; font-family: inherit; padding: 0; }
@@ -66,6 +90,17 @@
         .comment-edit:hover { color: #1a1a1a; }
         .comment-del:hover { color: #c92a2a; }
 
+        /* 답글 토글: 기본 ▶ 마커 제거, 작은 텍스트 버튼처럼 */
+        .reply-toggle { margin-top: 6px; }
+        .reply-toggle > summary {
+            list-style: none; display: inline-block; cursor: pointer; user-select: none;
+            font-size: 13px; color: #999;
+        }
+        .reply-toggle > summary::-webkit-details-marker { display: none; }
+        .reply-toggle > summary:hover,
+        .reply-toggle[open] > summary { color: #1a1a1a; }
+
+        /* 댓글/답글 작성 폼 */
         .comment-form textarea {
             width: 100%; min-height: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 6px;
             font-family: inherit; font-size: 15px; resize: vertical; box-sizing: border-box; line-height: 1.6;
@@ -78,8 +113,14 @@
         }
         .comment-form-bottom input:focus { outline: none; border-color: #1a1a1a; }
         .comment-form-bottom button { margin-left: auto; }
+
+        .reply-form { margin-top: 10px; }
+        .reply-form textarea { min-height: 60px; font-size: 14px; padding: 10px 12px; }
+        .reply-form .comment-form-bottom input { width: 120px; font-size: 13px; padding: 7px 10px; }
+        .reply-form .btn { padding: 7px 14px; font-size: 13px; }
     </style>
 </head>
+<body>
 
 <a class="back" th:href="@{/boards}">← 목록으로</a>
 
@@ -94,14 +135,15 @@
 <div class="summary"
      th:classappend="${board.summary == null} ? ' pending' : ''"
      id="summary-box">
-    <span class="summary-label">AI 요약</span>
+    <div class="summary-top">
+        <span class="summary-label">AI 요약</span>
+        <button type="button"
+                id="regenerate-btn"
+                class="summary-regen"
+                th:attr="data-board-id=${board.boardId}">다시 생성</button>
+    </div>
     <p id="summary-text"
        th:text="${board.summary} ?: '아직 요약이 없습니다.'"></p>
-    <button type="button"
-            id="regenerate-btn"
-            th:attr="data-board-id=${board.boardId}">
-        요약 다시 생성
-    </button>
 </div>
 
 <div class="content" th:text="${board.content}">
@@ -130,26 +172,54 @@
             <button type="submit" class="btn btn-delete">삭제</button>
         </div>
     </form>
-</dialog><section class="comments">
-    <h2 th:text="'댓글 ' + ${#lists.size(comments)}">댓글 0</h2>
+</dialog>
+
+<section class="comments">
+    <h2 th:text="'댓글 ' + ${#lists.size(comments.?[!isDeleted])}">댓글 0</h2>
 
     <ul class="comment-list">
-        <li th:each="comment : ${comments}" class="comment-item">
-            <div class="comment-head">
-                <span class="comment-writer" th:text="${comment.writer}">작성자</span>
-                <span class="comment-date"
-                      th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+        <li th:each="comment : ${comments}"
+            class="comment-item"
+            th:classappend="${comment.parentId != null} ? 'reply'">
 
-                <button type="button" class="comment-btn comment-edit"
-                        th:data-url="@{/boards/{bid}/comments/{cid}/edit(bid=${board.boardId}, cid=${comment.commentId})}"
-                        th:data-content="${comment.content}"
-                        onclick="openCommentEdit(this)">수정</button>
+            <!-- 삭제된 댓글 -->
+            <p th:if="${comment.isDeleted}" class="comment-deleted">삭제된 댓글입니다.</p>
 
-                <button type="button" class="comment-btn comment-del"
-                        th:data-url="@{/boards/{bid}/comments/{cid}/delete(bid=${board.boardId}, cid=${comment.commentId})}"
-                        onclick="openCommentDelete(this)">삭제</button>
-            </div>
-            <p class="comment-content" th:text="${comment.content}">내용</p>
+            <!-- 정상 댓글 -->
+            <th:block th:unless="${comment.isDeleted}">
+                <div class="comment-head">
+                    <span class="comment-writer" th:text="${comment.writer}">작성자</span>
+                    <span class="comment-date"
+                          th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+
+                    <button type="button" class="comment-btn comment-edit"
+                            th:data-url="@{/boards/{bid}/comments/{cid}/edit(bid=${board.boardId}, cid=${comment.commentId})}"
+                            th:data-content="${comment.content}"
+                            onclick="openCommentEdit(this)">수정</button>
+
+                    <button type="button" class="comment-btn comment-del"
+                            th:data-url="@{/boards/{bid}/comments/{cid}/delete(bid=${board.boardId}, cid=${comment.commentId})}"
+                            onclick="openCommentDelete(this)">삭제</button>
+                </div>
+                <p class="comment-content" th:text="${comment.content}">내용</p>
+
+                <details class="reply-toggle" th:if="${comment.parentId == null}">
+                    <summary>답글 달기</summary>
+                    <form class="comment-form reply-form" method="post"
+                          th:action="@{/boards/{id}/comments(id=${board.boardId})}">
+                        <input type="hidden" name="parentId" th:value="${comment.commentId}">
+                        <textarea name="content" maxlength="500"
+                                  placeholder="답글을 입력하세요" required></textarea>
+                        <div class="comment-form-bottom">
+                            <input type="text" name="writer" placeholder="작성자"
+                                   maxlength="20" required>
+                            <input type="password" name="password" placeholder="비밀번호"
+                                   minlength="4" maxlength="20" required>
+                            <button type="submit" class="btn btn-edit">등록</button>
+                        </div>
+                    </form>
+                </details>
+            </th:block>
         </li>
 
         <li th:if="${#lists.isEmpty(comments)}" class="comment-empty">
@@ -171,8 +241,6 @@
     </form>
 </section>
 
-
-
 <dialog id="commentEditDialog" class="dialog-wide">
     <form id="commentEditForm" method="post">
         <h2>댓글 수정</h2>
@@ -185,6 +253,7 @@
         </div>
     </form>
 </dialog>
+
 <dialog id="commentDeleteDialog">
     <form id="commentDeleteForm" method="post">
         <h2>댓글 삭제</h2>
@@ -198,21 +267,18 @@
     </form>
 </dialog>
 
-
 <script>
     function openCommentDelete(button) {
         commentDeleteForm.action = button.dataset.url;
         commentDeleteDialog.showModal();
     }
+
     function openCommentEdit(button) {
         commentEditForm.action = button.dataset.url;
         commentEditContent.value = button.dataset.content;   // 기존 내용 채우기
         commentEditDialog.showModal();
     }
-</script>
 
-</body>
-<script>
     document.getElementById('regenerate-btn').addEventListener('click', async (event) => {
         const button = event.currentTarget;
         const boardId = button.dataset.boardId;
@@ -251,4 +317,6 @@
         }
     });
 </script>
+
+</body>
 </html>
