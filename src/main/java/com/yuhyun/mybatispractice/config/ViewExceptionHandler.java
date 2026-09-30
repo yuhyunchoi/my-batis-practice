@@ -1,9 +1,7 @@
 package com.yuhyun.mybatispractice.config;
 
 import com.yuhyun.mybatispractice.board.controller.BoardViewController;
-import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
-import com.yuhyun.mybatispractice.exception.CommentNotFoundException;
-import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
+import com.yuhyun.mybatispractice.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Slf4j
 @ControllerAdvice(assignableTypes = BoardViewController.class)
 public class ViewExceptionHandler {
-    @ExceptionHandler(BoardNotFoundException.class)
+    @ExceptionHandler({BoardNotFoundException.class, CommentNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleBoardNotFound(BoardNotFoundException e, Model model) {
         model.addAttribute("status", 404);
@@ -31,18 +29,18 @@ public class ViewExceptionHandler {
         return "error";
     }
 
-    @ExceptionHandler(CommentNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleCommentNotFound(CommentNotFoundException e, Model model) {
-        model.addAttribute("status", 404);
-        model.addAttribute("message", e.getMessage());
-        return "error";
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public String handleValidation(MethodArgumentNotValidException e, Model model) {
         model.addAttribute("status", 400);
         model.addAttribute("message", "입력값을 확인해주세요.");
+        return "error";
+    }
+
+    @ExceptionHandler({BoardMismatchException.class, CommentAlreadyDeletedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBadRequest(RuntimeException e, Model model) {
+        model.addAttribute("status", 400);
+        model.addAttribute("message", e.getMessage());
         return "error";
     }
 }

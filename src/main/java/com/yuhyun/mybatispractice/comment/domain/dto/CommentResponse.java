@@ -10,7 +10,9 @@ public record CommentResponse(
         String content,
         String writer,
         LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+        LocalDateTime modifiedAt,
+        Long parentId,
+        Boolean isDeleted
 ) {
 
     public static CommentResponse from(Comment comment) {
@@ -20,7 +22,9 @@ public record CommentResponse(
                 comment.getContent(),
                 comment.getWriter(),
                 comment.getCreatedAt(),
-                comment.getModifiedAt()
+                comment.getModifiedAt(),
+                comment.getParentId(),
+                comment.getIsDeleted()
         );
     }
 }

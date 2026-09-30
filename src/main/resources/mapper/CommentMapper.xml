@@ -5,7 +5,10 @@
 <mapper namespace="com.yuhyun.mybatispractice.comment.mapper.CommentMapper">
 
     <select id="findCommentsByBoardId" resultType="com.yuhyun.mybatispractice.comment.domain.Comment">
-        select * from BOARD_COMMENT where BOARD_ID = #{boardId}
+        select *
+        from BOARD_COMMENT
+        where BOARD_ID = #{boardId}
+        order by COALESCE(PARENT_ID, COMMENT_ID), COMMENT_ID
     </select>
 
     <select id="findById" resultType="com.yuhyun.mybatispractice.comment.domain.Comment">
@@ -13,8 +16,8 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="commentId">
-        insert into BOARD_COMMENT(BOARD_ID, CONTENT, WRITER, PASSWORD)
-        values(#{boardId}, #{content}, #{writer}, #{password})
+        insert into BOARD_COMMENT(BOARD_ID, CONTENT, WRITER, PASSWORD, PARENT_ID)
+        values(#{boardId}, #{content}, #{writer}, #{password}, #{parentId})
     </insert>
 
     <update id="update">
@@ -22,7 +25,22 @@
         where COMMENT_ID = #{commentId}
     </update>
 
-    <delete id="deleteById">
+    <delete id="deleteByIdHard">
         delete from BOARD_COMMENT where COMMENT_ID = #{comment-id}
     </delete>
+
+   <update id="deleteByIdSoft">
+       update BOARD_COMMENT
+       set IS_DELETED = TRUE,
+        CONTENT = ''
+       WHERE COMMENT_ID = #{commentId}
+   </update>
+
+
+    <select id="existsByParentId" resultType="boolean">
+        select exists (
+            select 1 from BOARD_COMMENT where PARENT_ID = #{parentId}
+            )
+    </select>
+
 </mapper>

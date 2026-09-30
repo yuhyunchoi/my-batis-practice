@@ -45,7 +45,8 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardResponse findByBoardId(Long boardId) {
-        boardMapper.increaseViewCount(boardId);Board target = boardMapper.findById(boardId);
+        boardMapper.increaseViewCount(boardId);
+        Board target = boardMapper.findById(boardId);
 
         if (target == null) {
             throw new BoardNotFoundException(boardId);

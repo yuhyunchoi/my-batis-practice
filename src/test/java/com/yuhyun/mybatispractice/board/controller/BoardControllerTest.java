@@ -9,6 +9,7 @@ import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.exception.PasswordMismatchException;
 import com.yuhyun.mybatispractice.page.PageInfo;
 import com.yuhyun.mybatispractice.page.PageResponse;
+import com.yuhyun.mybatispractice.summary.BoardSummaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,9 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,6 +44,8 @@ class BoardControllerTest {
     @MockitoBean
     BoardService boardService;
 
+    @MockitoBean
+    BoardSummaryService boardSummaryService;
 
     private BoardResponse response;
 
@@ -204,4 +209,44 @@ class BoardControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void 요약_재생성_성공시_요약문을_반환한다() throws Exception {
+        //given
+        given(boardSummaryService.regenerate(1L)).willReturn(Optional.of("요약문"));
+
+        //when&then
+        mockMvc.perform(post("/v1/api/boards/{board-id}/summary", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.summary").value("요약문"));
+
+        verify(boardSummaryService).regenerate(1L);
+    }
+
+    @Test
+    void 요약_생성에_실패하면_summary가_null이다() throws Exception {
+        //given
+        given(boardSummaryService.regenerate(1L)).willReturn(Optional.empty());
+
+        //when&then
+        mockMvc.perform(post("/v1/api/boards/{board-id}/summary", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.summary").value(nullValue()));
+
+        verify(boardSummaryService).regenerate(1L);
+    }
+
+    @Test
+    void 게시글이_없으면_404를_반환한다() throws Exception {
+        //given
+        given(boardSummaryService.regenerate(999L))
+                .willThrow(new BoardNotFoundException("게시글이 없습니다."));
+
+        //when&then
+        mockMvc.perform(post("/v1/api/boards/{board-id}/summary", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("게시글이 없습니다."));
+
+        verify(boardSummaryService).regenerate(999L);
+
+    }
 }

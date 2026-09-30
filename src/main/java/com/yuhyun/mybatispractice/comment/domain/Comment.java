@@ -18,8 +18,10 @@ public class Comment {
     private String password;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private Long parentId;
+    private Boolean isDeleted;
 
-    public static Comment of(Long boardId, String content, String writer, String password) {
+    public static Comment of(Long boardId, String content, String writer, String password, Long parentId) {
         return new Comment(
                 null,
                 boardId,
@@ -27,7 +29,9 @@ public class Comment {
                 writer,
                 password,
                 null,
-                null
+                null,
+                parentId,
+                false
         );
     }
 }

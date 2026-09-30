@@ -21,8 +21,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{board-id}")
-    public List<CommentResponse> getCommentsByBoardId(@PathVariable(name = "board-id") Long boarId) {
-        return commentService.findCommentsByBoardId(boarId);
+    public List<CommentResponse> getCommentsByBoardId(@PathVariable(name = "board-id") Long boardId) {
+        return commentService.findCommentsByBoardId(boardId);
     }
 
     @PostMapping("/{board-id}")

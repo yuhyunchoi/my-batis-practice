@@ -8,6 +8,7 @@ import com.yuhyun.mybatispractice.comment.service.CommentService;
 import com.yuhyun.mybatispractice.exception.BoardNotFoundException;
 import com.yuhyun.mybatispractice.page.PageInfo;
 import com.yuhyun.mybatispractice.page.PageResponse;
+import com.yuhyun.mybatispractice.summary.BoardSummaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ class BoardViewControllerTest {
     @MockitoBean
     CommentService commentService;
 
+    @MockitoBean
+    BoardSummaryService boardSummaryService;
+
     private BoardResponse boardResponse;
     private CommentResponse commentResponse;
 
@@ -45,7 +49,7 @@ class BoardViewControllerTest {
                 LocalDateTime.now(), LocalDateTime.now(), 5, null);
         commentResponse = new CommentResponse(
                 7L, 1L, "댓글 내용", "홍길동",
-                LocalDateTime.now(), LocalDateTime.now());
+                LocalDateTime.now(), LocalDateTime.now(), null, Boolean.FALSE);
     }
 
     @Test
