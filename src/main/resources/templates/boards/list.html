@@ -13,12 +13,25 @@
       cursor: pointer; font-family: inherit; }
     .btn:hover { background: #333; }
 
-    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-    .search-bar input {
-      flex: 1; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px;
-      font-size: 14px; font-family: inherit;
+    .search-bar { display: flex; gap: 8px; align-items: center; width: 100%; }
+
+    /* select, input 높이·테두리 통일 */
+    .search-bar select,
+    .search-bar input[type="text"] {
+      height: 38px; padding: 0 12px; box-sizing: border-box;
+      border: 1px solid #ddd; border-radius: 6px;
+      font-size: 14px; font-family: inherit; background: #fff;
     }
-    .search-bar input:focus { outline: none; border-color: #1a1a1a; }
+    .search-bar select:focus,
+    .search-bar input[type="text"]:focus { outline: none; border-color: #1a1a1a; }
+
+    /* 입력창이 남는 공간을 차지하게 */
+    .search-bar input[type="text"] { flex: 1; max-width: 360px; }
+
+    .search-bar .btn { height: 38px; }
+
+    /* 정렬은 오른쪽 끝 */
+    .sort-select { margin-left: auto; }
 
     .total { font-size: 13px; color: #888; margin-bottom: 8px; }
 
@@ -47,8 +60,14 @@
 </div>
 
 <form class="search-bar" method="get" th:action="@{/boards}">
+  <select name="searchType">
+    <option value="TITLE" th:selected="${condition.searchType.name() == 'TITLE'}">제목</option>
+    <option value="CONTENT" th:selected="${condition.searchType.name() == 'CONTENT'}">내용</option>
+    <option value="WRITER" th:selected="${condition.searchType.name() == 'WRITER'}">작성자</option>
+    <option value="TITLE_CONTENT" th:selected="${condition.searchType.name() == 'TITLE_CONTENT'}">제목 + 내용</option>
+  </select>
   <input type="text" name="keyword" th:value="${condition.keyword}"
-         placeholder="제목으로 검색" maxlength="50">
+         placeholder="검색어를 입력하세요." maxlength="50">
   <button type="submit" class="btn">검색</button>
   <select name="sortType">
     <option value="LATEST" th:selected="${condition.sortType.name() == 'LATEST'}">최신순</option>
@@ -92,7 +111,7 @@
      th:href="@{/boards(page=${result.pageInfo.startPage - 1}, keyword=${condition.keyword})}">←</a>
 
   <a th:each="p : ${#numbers.sequence(result.pageInfo.startPage, result.pageInfo.endPage)}"
-     th:href="@{/boards(page=${p}, keyword=${condition.keyword}, sortType=${condition.sortType})}"
+     th:href="@{/boards(page=${p}, keyword=${condition.keyword}, searchType=${condition.searchType}, sortType=${condition.sortType})}"
      th:text="${p}"
      th:classappend="${p == result.pageInfo.page} ? 'active'">1</a>
 

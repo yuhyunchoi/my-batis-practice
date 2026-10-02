@@ -7,7 +7,21 @@
     <sql id="searchCondition">
         <where>
             <if test="keyword != null and keyword != ''">
-                TITLE LIKE CONCAT('%', #{keyword}, '%')
+                <choose>
+                    <when test="searchType.name() == 'CONTENT'">
+                        CONTENT LIKE CONCAT('%', #{keyword} ,'%')
+                    </when>
+                    <when test="searchType.name() == 'WRITER'">
+                        WRITER LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType.name() == 'TITLE_CONTENT'">
+                        (TITLE LIKE CONCAT('%', #{keyword}, '%')
+                            OR CONTENT LIKE CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        TITLE LIKE CONCAT('%', #{keyword}, '%')
+                    </otherwise>
+                </choose>
             </if>
         </where>
     </sql>
