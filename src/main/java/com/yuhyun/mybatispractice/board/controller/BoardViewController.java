@@ -102,5 +102,4 @@ public class BoardViewController {
 
         return "redirect:/boards/" + boardId;
     }
-
 }
